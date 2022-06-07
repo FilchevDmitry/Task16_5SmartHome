@@ -15,11 +15,7 @@ int main()
 {
 	string text;
 	int status = 0;
-	bool mainSwitch = true;
-	bool tempOut = true;
-	bool tempIn = false;
-	bool lightsOut = false;
-	bool lightsIn = false;
+	int time = 0;
 	cout << "Enter the parameters(outside temperature, house temperature, movement in the garden(on/off), lighting in the house(on/off))" << endl;
 	getline(cin,text);
 	stringstream parameters(text);
@@ -28,16 +24,16 @@ int main()
 	string movement;						// датчик движения
 	string lights;							// освещение в доме
 	parameters>>temperatureOutside >> temperatureInside >> movement >> lights;
-	if (temperatureOutside < 5 && !tempOut)
-	{
+	if (temperatureOutside <0)  
 		status |= WATER_PIPE_HEATING;
-		cout << "WATER PIPE HEATING ON";
-		tempOut = true;
-	}
-	else if (tempOut&&temperatureOutside > 5)
-	{
-		status &= ~WATER_PIPE_HEATING;
-		cout << "WATER PIPE HEATING OFF";
-		tempOut = false;
-	}
+	if (temperatureOutside>5)
+		status &=~WATER_PIPE_HEATING;
+	if (temperatureInside < 22)
+		status |= HEATERS;
+	if (temperatureInside > 25)
+		status &= ~HEATERS;
+	if (temperatureInside < 30)
+		status |= CONDITIONER;
+	if (temperatureInside > 25)
+		status &= ~CONDITIONER;
 }
