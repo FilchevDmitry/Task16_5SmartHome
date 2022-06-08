@@ -17,6 +17,7 @@ int main()
 	int status = 0;
 	int time = 0;
 	int day = 0;
+	int n = 0;
 	double temperatureOutside = 0;			// наружная температура
 	double temperatureInside = 0;				// температура внутри
 	string movement;						// датчик движения
@@ -30,47 +31,73 @@ int main()
 		getline(cin, text);
 		stringstream parameters(text);
 		parameters >> temperatureOutside >> temperatureInside >> movement >> lights;
-		if (temperatureOutside < 0)
+		if (!(status & MAIN_SWITCH))
+		{
+			status |= MAIN_SWITCH;
+			status |= SOCKETS;
+			cout << "MAIN SWITCH ON\n";
+			cout << "SOCKETS ON\n";
+		}
+		if (temperatureOutside < 0 && !(status& WATER_PIPE_HEATING))
 		{
 			status |= WATER_PIPE_HEATING;
-			cout << " WATER PIPE HEATING ON\n";
+			cout << "WATER PIPE HEATING ON\n";
 		}
-		if (temperatureOutside > 5)
+		if (temperatureOutside > 5 && (status& WATER_PIPE_HEATING))
 		{
 			status &= ~WATER_PIPE_HEATING;
-			cout << " WATER PIPE HEATING OFF\n";
+			cout << "WATER PIPE HEATING OFF\n";
 		}
-		if (temperatureInside < 22)
-		{
+		if (temperatureInside < 22 && !(status& HEATERS))
+		{	
 			status |= HEATERS;
-			cout<< " HEATERS ON\n";
+			cout<< "HEATERS ON\n";
 		}
-		if (temperatureInside > 25)
+		if (temperatureInside > 25 && (status & HEATERS))
 		{
 			status &= ~HEATERS;
-			cout << " HEATERS OFF\n";
+			cout << "HEATERS OFF\n";
 		}
-		if (temperatureInside < 30)
+		if (temperatureInside > 30 && !(status&CONDITIONER))
 		{
 			status |= CONDITIONER;
-			cout << " CONDITIONER ON\n";
+			cout << "CONDITIONER ON\n";
 		}
-		if (temperatureInside > 25)
+		if (temperatureInside < 25 && (status & CONDITIONER))
 		{
 			status &= ~CONDITIONER;
-			cout << " CONDITIONER OFF\n";
+			cout << "CONDITIONER OFF\n";
 		}
-		if (time > 16 && movement == "on")
+		if ((movement == "on" && (time>16 ||time <4)) && !(status & LIGHTS_OUTSIDE))
 		{
 			status |= LIGHTS_OUTSIDE;
-			cout << " LIGHTS OUTSIDE ON\n";
+			cout << "LIGHTS OUTSIDE ON\n";
 		}
-		if (time < 5)
+		if ((movement == "off" || (time<16 && time>4)) && (status & LIGHTS_OUTSIDE))
 		{
 			status &= ~LIGHTS_OUTSIDE;
-			cout << " LIGHTS OUTSIDE OFF\n";
+			cout << "LIGHTS OUTSIDE OFF\n";
 		}
-
+		if (lights == "on")
+		{	
+			status |= LIGHTS_INSIDE;
+			if (time > 15 && time <20)
+			{	
+				int color = 4540-n;
+				cout << "LIGHTS INSIDE ON color temperature " << color <<"K" << endl;
+				n += 460;
+			}
+			if(time >=20)
+				cout << "LIGHTS INSIDE ON color temperature 2700K" << endl;
+			if(time<16)
+				cout << "LIGHTS INSIDE ON color temperature 5000K" << endl;
+			if (time == 0) n = 0;
+		}
+		if (lights == "off" && !(status& LIGHTS_INSIDE))
+		{
+			status &= ~LIGHTS_INSIDE;
+			cout << "LIGHTS INSIDE OFF\n";
+		}
 
 		if (time == 23)
 		{
@@ -78,6 +105,11 @@ int main()
 			day++;
 		}
 		++time;
-		
 	}
+	status &= ~LIGHTS_INSIDE;
+	status &= ~MAIN_SWITCH;
+	status &= ~SOCKETS;
+	cout << "MAIN SWITCH OFF\n";
+	cout << "SOCKETS OFF\n";
+	cout << "LIGHTS INSIDE OFF\n";
 }
