@@ -17,6 +17,10 @@ int main()
 	int status = 0;
 	int time = 0;
 	int day = 0;
+	double temperatureOutside = 0;			// наружная температура
+	double temperatureInside = 0;				// температура внутри
+	string movement;						// датчик движения
+	string lights;							// освещение в доме
 	while (!(day==2))
 	{
 		string timer = to_string(time);
@@ -25,30 +29,48 @@ int main()
 		cout << "Time " << timer << ":00\n" << " Enter the parameters(outside temperature, house temperature, movement in the garden(on/off), lighting in the house(on/off))" << endl;
 		getline(cin, text);
 		stringstream parameters(text);
-		double temperatureOutside = 0;			// наружная температура
-		double temperatureInside = 0;				// температура внутри
-		string movement;						// датчик движения
-		string lights;							// освещение в доме
 		parameters >> temperatureOutside >> temperatureInside >> movement >> lights;
 		if (temperatureOutside < 0)
+		{
 			status |= WATER_PIPE_HEATING;
-		if (temperatureOutside > 5)
-			status &= ~WATER_PIPE_HEATING;
-		if (temperatureInside < 22)
-			status |= HEATERS;
-		if (temperatureInside > 25)
-			status &= ~HEATERS;
-		if (temperatureInside < 30)
-			status |= CONDITIONER;
-		if (temperatureInside > 25)
-			status &= ~CONDITIONER;
-		if (time > 16 && movement == "on")
-			status |= LIGHTS_OUTSIDE;
-		if(time < 5)
-			status &= ~LIGHTS_OUTSIDE;
-
-		if (status & WATER_PIPE_HEATING)
 			cout << " WATER PIPE HEATING ON\n";
+		}
+		if (temperatureOutside > 5)
+		{
+			status &= ~WATER_PIPE_HEATING;
+			cout << " WATER PIPE HEATING OFF\n";
+		}
+		if (temperatureInside < 22)
+		{
+			status |= HEATERS;
+			cout<< " HEATERS ON\n";
+		}
+		if (temperatureInside > 25)
+		{
+			status &= ~HEATERS;
+			cout << " HEATERS OFF\n";
+		}
+		if (temperatureInside < 30)
+		{
+			status |= CONDITIONER;
+			cout << " CONDITIONER ON\n";
+		}
+		if (temperatureInside > 25)
+		{
+			status &= ~CONDITIONER;
+			cout << " CONDITIONER OFF\n";
+		}
+		if (time > 16 && movement == "on")
+		{
+			status |= LIGHTS_OUTSIDE;
+			cout << " LIGHTS OUTSIDE ON\n";
+		}
+		if (time < 5)
+		{
+			status &= ~LIGHTS_OUTSIDE;
+			cout << " LIGHTS OUTSIDE OFF\n";
+		}
+
 
 		if (time == 23)
 		{
@@ -56,5 +78,6 @@ int main()
 			day++;
 		}
 		++time;
+		
 	}
 }
